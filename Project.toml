@@ -4,4 +4,9 @@ authors = ["Chen Xincheng "]
 version = "0.1.0"
 
 [deps]
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
+UnfoldMakie = "69a5ce3b-64fb-4f22-ae69-36dd4416af2a"
+UnfoldSim = "ed8ae6d2-84d3-44c6-ab46-0baf21700804"

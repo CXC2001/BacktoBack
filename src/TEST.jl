@@ -1,23 +1,24 @@
-using UnfoldSim 
+using UnfoldSim
 using UnfoldMakie
 using CairoMakie
 using DataFrames
 using Random
 
-design = SingleSubjectDesign(conditions = Dict(:picture => ["dog","cat"])) |> x->RepeatDesign(x,10)
+design = SingleSubjectDesign(conditions = Dict(:condA => ["levelA"]))
 
-c = LinearModelComponent(; basis = p100(), formula = @formula(0 ~ 1+picture), β = [1,0.5]);
-c2 = LinearModelComponent(; basis = p300(), formula = @formula(0 ~ 1), β = [1,-3]);
+c = LinearModelComponent(; basis = p100(), formula = @formula(0 ~ 1), β = [1]);
+c2 = LinearModelComponent(; basis = p300(), formula = @formula(0 ~ 1), β = [1]);
+
+mc = UnfoldSim.MultichannelComponent(c, [1, 2, -1, 3, 5, 2.3, 1])
 
 hart = headmodel(type = "hartmut")
 mc = UnfoldSim.MultichannelComponent(c, hart => "Left Postcentral Gyrus")
 mc2 = UnfoldSim.MultichannelComponent(c2, hart => "Right Occipital Pole")
 
-onset = NoOnset();#UniformOnset(; width = 20, offset = 4);
+onset = UniformOnset(; width = 20, offset = 4);
 
 data, events =
-    simulate(MersenneTwister(1), design, [mc, mc2], onset, PinkNoise(noiselevel = 0.0);return_epoched=true
-    )
+    simulate(MersenneTwister(1), design, [mc, mc2], onset, PinkNoise(noiselevel = 0.05))
 size(data)
 
 pos3d = hart.electrodes["pos"];
