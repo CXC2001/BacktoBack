@@ -7,7 +7,7 @@ using Random
 design = SingleSubjectDesign(conditions = Dict(:picture => ["dog","cat"])) |> x->RepeatDesign(x,10)
 
 c = LinearModelComponent(; basis = p100(), formula = @formula(0 ~ 1+picture), β = [1,0.5]);
-c2 = LinearModelComponent(; basis = p300(), formula = @formula(0 ~ 1), β = [1,-3]);
+c2 = LinearModelComponent(; basis = p300(), formula = @formula(0 ~ 1+picture), β = [1,-3]);
 
 hart = headmodel(type = "hartmut")
 mc = UnfoldSim.MultichannelComponent(c, hart => "Left Postcentral Gyrus")
