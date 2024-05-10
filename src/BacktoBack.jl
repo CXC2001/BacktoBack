@@ -1,33 +1,28 @@
 using Unfold
 using UnfoldMakie, CairoMakie
 using UnfoldSim
+using UnfoldDecode
 dat, evts = UnfoldSim.predef_eeg(; noiselevel = 10, return_epoched = true)
 
-f = @formula 0 ~ 1 + condition + continuous
-designDict = Dict(Any => (f, range(0, 1, length = size(dat, 1))))
+evts.continuous_random .= rand(size(evts,1))
+evts.categorical_correlated .= evts.continuous .+ 10 .*rand(size(evts,1)).>7.5 # make random samples with a correlation of e.g. 0.5 to evts.continuous
+f = @formula 0 ~ 1  + continuous 
 
-# #---
-# se_solver = (x, y) -> Unfold.solver_default(x, y, stderror = true)
-# m = Unfold.fit(UnfoldModel, designDict, evts, dat, solver = se_solver)
-# results = coeftable(m)
-# plot_erp(results; stderror = true)
-# #---
+f = @formula 0 ~ 1  + categorical_correlated 
 
-# using Krylov, CUDA # necessary to load the right package extension
-# gpu_solver =(x, y) -> Unfold.solver_krylov(x, y; GPU = true)
-# m = Unfold.fit(UnfoldModel, designDict, evts, dat, solver = gpu_solver)
+f = @formula 0 ~ 1  + continuous + categorical_correlated
 
-# using RobustModels # necessary to load the Unfold package extension
-# se_solver = (x, y) -> Unfold.solver_robust(x, y)
-# m = Unfold.fit(UnfoldModel, designDict, evts, dat, solver = se_solver)
-# results = coeftable(m)
-# plot_erp(results; stderror = true)
 
-#---
-b2b_solver = (x, y) -> Unfold.solver_b2b(x, y; cross_val_reps = 5)
-dat_3d = permutedims(repeat(dat, 1, 1, 20), [3 1 2])
+f = @formula 0 ~ 1 + condition + continuous + continuous_random
+designDict = [Any => (f, range(0, 0.44, step = 1/100))]
+
+
+b2b_solver = (x, y) -> UnfoldDecode.solver_b2b(x, y; cross_val_reps = 5)
+dat_3d = permutedims(repeat(dat, 1, 1, 20), [3 1 2]);
 m = Unfold.fit(UnfoldModel, designDict, evts, dat_3d; solver = b2b_solver)
 results = coeftable(m)
+results.estimate = abs.(results.estimate)
+results = results[results.coefname .!="(Intercept)",:]
 #---
 
 plot_erp(results)
