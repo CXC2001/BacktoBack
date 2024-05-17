@@ -13,7 +13,7 @@ hart = headmodel(type = "hartmut")
 mc = UnfoldSim.MultichannelComponent(c, hart => "Left Postcentral Gyrus")
 
 mc2 = UnfoldSim.MultichannelComponent(c2, hart => "Right Occipital Pole")
-# mc2 = UnfoldSim.MultichannelComponent(c2, hart => "Left Postcentral Gyrus")
+mc2 = UnfoldSim.MultichannelComponent(c2, hart => "Left Postcentral Gyrus")
 
 onset = NoOnset();#UniformOnset(; width = 20, offset = 4);
 
@@ -53,8 +53,9 @@ plot_topoplot!(
 f
 
 #---
+
 data_d = mean(data[:,:,events.picture .=="dog"],dims=3) .- mean(data[:,:,events.picture .=="cat"],dims=3)
-data_d = mean(data[:,:,events.hue .=="color"],dims=3) .- mean(data[:,:,events.hue .=="grayscale"],dims=3)
+#data_d = mean(data[:,:,events.hue .=="color"],dims=3) .- mean(data[:,:,events.hue .=="grayscale"],dims=3)
 
 f = Figure()
 df = DataFrame(
