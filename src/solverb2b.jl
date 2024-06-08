@@ -31,8 +31,8 @@ function solver_b2b(
                 Y2 = @view data[:, t, k_ix[2]]
 
 
-                G = (Y1' \ X1)
-                H = X2 \ (Y2' * G)
+                G = (Y1' \ X1) # decoding weight  vector, for each column of X independently how much do I need to weight each channel (similar to decoding betas)
+                H = X2 \ (Y2' * G) # 
 
                 E[t, :, :] +=  Diagonal(H[diagind(H)])
                 ProgressMeter.next!(prog; showvalues = [(:time, t), (:cross_val_rep, m)])
