@@ -21,7 +21,7 @@ evts.vegetable .= ["tomato","carrot"][1 .+ (evts.eye_angle .+ 10 .* rand(size(ev
 
 b2b_solver = (x, y) -> UnfoldDecode.solver_b2b(x, y; cross_val_reps = 5)
 #b2bcv_solver = (x, y) -> UnfoldDecode.solver_b2bcv(x, y; cross_val_reps = 5)
-dat_3d = permutedims(repeat(dat, 1, 1, 20), [3 1 2]);
+dat_3d = permutedims(repeat(dat, 1, 1, 20), [3 1 2]); # repeat the dat 20 times and permute the dimensions
 dat_3d .+= 0.1*rand(size(dat_3d)...)
 
 results_all = DataFrame()
@@ -31,7 +31,7 @@ for ix = 1:4
     elseif ix==2
         f = @formula 0 ~ 1  + animal + vegetable 
     elseif ix==3
-        f = @formula 0 ~ 1  + animal + eye_angle + vegetable
+        f = @formula 0 ~ 1  + animal + vegetable + eye_angle
     elseif ix ==4
         f = @formula 0 ~ 1 + animal + eye_angle + continuous_random + vegetable
     end
@@ -86,8 +86,8 @@ ax = Axis(fig[1, 1],
     ylabel = "amplitude")
     ix = 3
 scatter!(X1[1:30, ix], color=:blue, label="X1")
-scatter!(X_hat[1:30, ix], color=:red, label="X_hat")
+scatter!(X1_hat[1:30, ix], color=:red, label="X_hat")
 display(fig)
 #--
 ix = 3
-scatter(X1[:,ix],X_hat[:, ix], color=:red, label="X_hat")
+scatter(X1[:,ix],X1_hat[:, ix], color=:red, label="X_hat")
