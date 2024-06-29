@@ -5,6 +5,8 @@ using UnfoldDecode
 using DataFrames
 using Statistics
 using MLBase
+using MLJ
+using MLJLinearModels,Tables,GLMNet
 
 dat, evts = UnfoldSim.predef_eeg(; noiselevel = 0.1, return_epoched = true)
 
@@ -20,10 +22,15 @@ evts.continuous_random .= rand(size(evts,1)) # add a new column "continuous_rand
 evts.vegetable .= ["tomato","carrot"][1 .+ (evts.eye_angle .+ 10 .* rand(size(evts,1)) .> 7.5)] # make random samples with a correlation of e.g. 0.5 to evts.continuous
 
 b2b_solver = (x, y) -> UnfoldDecode.solver_b2b(x, y; cross_val_reps = 5)
-#b2bcv_solver = (x, y) -> UnfoldDecode.solver_b2bcv(x, y; cross_val_reps = 5)
+b2b_solver = (x, y) -> UnfoldDecode.solver_b2b(x, y; cross_val_reps = 5,regularization_method="LinearRegressor")
+b2b_solver = (x, y) -> UnfoldDecode.solver_b2b(x, y; cross_val_reps = 5,regularization_method="SVMRegressor")
+
+# LinearRegressor
+# b2bcv_solver = (x, y) -> UnfoldDecode.solver_b2bcv(x, y; cross_val_reps = 5)
 dat_3d = permutedims(repeat(dat, 1, 1, 20), [3 1 2]); # repeat the dat 20 times and permute the dimensions
 dat_3d .+= 0.1*rand(size(dat_3d)...)
 
+#---
 results_all = DataFrame()
 for ix = 1:4
     if ix == 1
@@ -72,6 +79,26 @@ G = (Y1' \ X1)
 X1_hat = Y1' * G
 X2_hat = Y2' * G
 H = X2 \ X2_hat
+
+tm = TunedModel(model=RidgeRegressor(fit_intercept=false),
+            resampling = CV(nfolds=5),
+            tuning = Grid(resolution=10),
+            range = range(RidgeRegressor(), :lambda, lower=1e-2, upper=1000, scale=:log10),
+            measure = MLJ.rms)
+
+function ridge(tm,data,X)
+    G = Array{Float64}(undef,size(data,2),size(X,2))
+    for pred in 1:size(X,2)
+        #println(elscitype(data))
+        mtm = machine(tm,table(data),X[:,pred])
+        fit!(mtm,verbosity=0)
+        G[:,pred] = Tables.matrix(fitted_params(mtm).best_fitted_params.coefs)[:,2]
+    end
+    return G
+end
+
+G = ridge(tm,Y1',X1)
+H = ridge(tm,X2, (Y2'*G))
 
 
 
