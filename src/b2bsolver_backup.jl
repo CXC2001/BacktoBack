@@ -137,14 +137,7 @@ function SVM(tm,data,X)
 
 
 #                 G = (Y1' \ X1)
-#                 H = X2 \ (Y2' * G)   mtm = machine(tm,table(data),X[:,pred])
-        fit!(mtm,verbosity=0)
-        G[:,pred] = Tables.matrix(fitted_params(mtm).best_fitted_params.coefs)[:,2]
-    end
-    
-end    
-    
-
+#                 H = X2 \ (Y2' * G)   
 
 #     E = zeros(T,size(data, 2), size(X, 2), size(X, 2))
 #     W = Array{T}(undef, size(data, 2), size(X, 2), size(data, 1))

@@ -22,7 +22,7 @@ evts.continuous_random .= rand(size(evts,1)) # add a new column "continuous_rand
 evts.vegetable .= ["tomato","carrot"][1 .+ (evts.eye_angle .+ 10 .* rand(size(evts,1)) .> 7.5)] # make random samples with a correlation of e.g. 0.5 to evts.continuous
 
 b2b_solver = (x, y) -> UnfoldDecode.solver_b2b(x, y; cross_val_reps = 5)
-b2b_solver = (x, y) -> UnfoldDecode.solver_b2b(x, y; cross_val_reps = 5,regularization_method="LinearRegressor")
+b2b_solver = (x, y) -> UnfoldDecode.solver_b2b(x, y; cross_val_reps = 5,regularization_method="LSRegressor")
 b2b_solver = (x, y) -> UnfoldDecode.solver_b2b(x, y; cross_val_reps = 5,regularization_method="SVMRegressor")
 
 # LinearRegressor
